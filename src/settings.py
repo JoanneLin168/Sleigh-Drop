@@ -13,7 +13,7 @@ house_gap = (house_size * 2) + (house_size // 2)
 cloud_spawn_chance = 0.5
 cloud_storm_chance = 0.1
 clouds_spawn_min_score = 5
-cloud_size_units = [1, 2, 3]
+cloud_size_units = [2, 3, 4]
 cloud_size = WIDTH // 10
 cloud_gap = (cloud_size * 2) + (cloud_size // 2)
 
@@ -25,7 +25,7 @@ world_shift_acceleration = -0.0001
 player_start_pos = (250, HEIGHT//2)
 player_size = 30
 max_health = 5
-animation_delay = 3
+animation_delay = 7
 follow_strength = 0.1
 max_speed = 5
 drop_cooldown = 0  # ms

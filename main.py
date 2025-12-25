@@ -90,9 +90,8 @@ class Main:
                     elif result == "tutorial":
                         self.state = TUTORIAL
                     elif result == "highscore":
-                        self.highscore_screen = HighscoreScreen(self.screen, load_highscores())
                         back_btn = Button(WIDTH//2-100, HEIGHT-100, 200, 50, "Back", self.font)
-                        self.highscore_screen.set_back_button(back_btn)
+                        self.highscore_screen = HighscoreScreen(self.screen, load_highscores(), buttons=[(back_btn, "back")])
                         self.state = HIGHSCORE
 
                 elif self.state == TUTORIAL:

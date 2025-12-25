@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 HIGHSCORE_FILE = "highscores.json"
-MAX_ENTRIES = 8
+MAX_ENTRIES = 5
 
 def load_highscores():
     if not os.path.exists(HIGHSCORE_FILE):
