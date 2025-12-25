@@ -4,11 +4,19 @@ import pygame
 
 WIDTH, HEIGHT = 800, 600
 
-# pipes
+# houses
 house_sizes_units = [x for x in range (1, 8)]
 house_size = HEIGHT // 10
 house_gap = (house_size * 2) + (house_size // 2)
 ground_space = 50
+
+# clouds
+cloud_spawn_chance = 0.9
+cloud_storm_chance = 0.9
+clouds_spawn_min_score = 0
+cloud_size_units = [1, 2, 3]
+cloud_size = WIDTH // 10
+cloud_gap = (cloud_size * 2) + (cloud_size // 2)
 
 # world scrolling
 world_shift_speed = -3 # this with gradually get faster over time
@@ -20,6 +28,9 @@ animation_delay = 3
 follow_strength = 0.1
 max_speed = 5
 drop_cooldown = 0  # ms
+
+# present
+present_speed = 20
 
 def import_sprite(path):
     surface_list = []

@@ -1,4 +1,5 @@
 import pygame
+from settings import present_speed
 
 class Present(pygame.sprite.Sprite):
     def __init__(self, width, pos, size):
@@ -8,8 +9,7 @@ class Present(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=pos)
         self.width = width
         self.scored = False
-
-        self.speed_y = 30
+        self.speed_y = present_speed
 
     def update(self, x_shift):
         self.rect.x += x_shift

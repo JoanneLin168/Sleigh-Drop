@@ -1,11 +1,13 @@
 import pygame
 from house import House
+from cloud import Cloud
 from player import Player
 from game import GameIndicator
 from settings import (
     WIDTH, HEIGHT, house_size, house_gap, house_sizes_units,
     world_shift_speed, world_shift_acceleration,
-    max_health
+    max_health,
+    cloud_spawn_chance, clouds_spawn_min_score, cloud_size_units, cloud_size, cloud_gap, cloud_storm_chance
 )
 
 from present import Present
@@ -18,6 +20,8 @@ class World:
         self.current_x = 0
         self.current_house = None
         self.houses = pygame.sprite.Group()
+        self.clouds = pygame.sprite.Group()
+        self.clouds_storm = pygame.sprite.Group()
         self.player = pygame.sprite.GroupSingle()
         self._generate_world()
         self.playing = False
@@ -31,20 +35,40 @@ class World:
 
     # creates the player and the obstacle
     def _generate_world(self):
-        self._add_house()
         player = Player((WIDTH//2 - house_size, HEIGHT//2 - house_size), 30)
         self.player.add(player)
+        self._add_house()
 
     # adds house once the last house added reached the desired house horizontal spaces
     def _add_house(self):
         house_size_rnd = random.choice(house_sizes_units)
         house_good = random.choice([True, False])
-        house_height = house_size_rnd * house_size
+        house_width = house_size_rnd * house_size
 
-        house = House((WIDTH, house_height + house_gap), house_size, HEIGHT, house_good)
+        house = House((WIDTH, house_width + house_gap), house_size, HEIGHT, house_good)
         self.houses.add(house)
 
         self._update_current_house()
+
+        # Only add cloud if the house size is small enough (to allow player to pass)
+        if house_size_rnd <= 4 and random.random() < cloud_spawn_chance:
+            self._add_cloud()
+
+    # adds cloud
+    def _add_cloud(self):
+        # Only add cloud if score is high enough
+        if self.player.sprite.score > clouds_spawn_min_score:
+            cloud_size_rnd = random.choice(cloud_size_units)
+            cloud_width = cloud_size_rnd * cloud_size
+            cloud_pos = (WIDTH, random.randint(50, HEIGHT // 3))
+            cloud_storm = random.random() < cloud_storm_chance
+
+            cloud = Cloud(cloud_pos, cloud_width, cloud_size, cloud_storm)
+
+            if cloud_storm:
+                self.clouds_storm.add(cloud)
+            else:
+                self.clouds.add(cloud)
 
     # for moving background/obstacle
     def _scroll_x(self):
@@ -67,14 +91,19 @@ class World:
     # handles scoring and collision
     def _handle_collisions(self):
         player = self.player.sprite
+        
         # for collision checking
         if pygame.sprite.groupcollide(self.player, self.houses, False, False) or player.rect.bottom >= HEIGHT or player.rect.top <= 0:
             self.playing = False
             self.game_over = True
             self.player.sprite.health = 0
-        else:
-            # if player pass through the house gaps
-            player = self.player.sprite
+        elif pygame.sprite.groupcollide(self.player, self.clouds, False, True):
+            self.player.sprite.health -= 1
+        elif pygame.sprite.groupcollide(self.player, self.clouds_storm, False, False):
+            self.playing = False
+            self.game_over = True
+            self.player.sprite.health = 0
+
 
         # Increment score if passed a bad house
         if player.rect.x >= self.current_house.rect.centerx and not self.current_house.good:
@@ -84,8 +113,8 @@ class World:
         
 
     def _spawn_present(self):
-        bird = self.player.sprite
-        present = Present(WIDTH, bird.rect.center, 30)
+        player = self.player.sprite
+        present = Present(WIDTH, player.rect.center, 30)
         self.presents.add(present)
 
     def _check_present_scoring(self):
@@ -128,15 +157,12 @@ class World:
         self._handle_collisions()
         self._check_present_scoring()
 
-        # configuring player actions
-        if not self.playing:
-            self.game.instructions()
-
         # Check health bar
         if self.player.sprite.health <= 0:
             self.playing = False
             self.game_over = True
 
+        # Controls
         if player_event == "shoot" and not self.game_over:
             player_event = True
             if self.player.sprite.drop_present():
@@ -145,15 +171,21 @@ class World:
             self.game_over = False
             self.houses.empty()
             self.player.empty()
+            self.clouds.empty()
+            self.clouds_storm.empty()
+            self.presents.empty()
             self.player.score = 0
             self._generate_world()
         else:
             player_event = False
 
+        # configuring player actions
         if self.playing:
             self.player.sprite.move()
+        else:
+            self.game.instructions()
 
-        # new house adder
+        # New house adder
         self.distance_since_last_house += abs(self.world_shift)
         if self.distance_since_last_house >= self.next_house_distance:
             self._add_house()
@@ -163,10 +195,17 @@ class World:
         # Drawing sprites
         self.houses.update(self.world_shift)
         self.houses.draw(self.screen)
+        self.clouds.update(self.world_shift // 2)  # Clouds move slower
+        self.clouds.draw(self.screen)
+        self.clouds_storm.update(self.world_shift // 2)  # Clouds move slower
+        self.clouds_storm.draw(self.screen)
         self.player.update(player_event)
         self.player.draw(self.screen)
         self.presents.update(self.world_shift)
         self.presents.draw(self.screen)
+
+
+        # Drawing game info
         self.game.show_score(self.player.sprite.score)
         self.draw_health_bar(
             self.screen,
@@ -175,3 +214,10 @@ class World:
             health=self.player.sprite.health,
             max_health=max_health
         )
+
+        
+        # Debugging
+        for cloud in self.clouds:
+            cloud.draw_hitboxes(self.screen)
+        for cloud in self.clouds_storm:
+            cloud.draw_hitboxes(self.screen)
