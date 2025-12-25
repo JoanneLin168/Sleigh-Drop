@@ -7,6 +7,7 @@ from src.ui.menu import Menu
 from src.ui.textscreen import TextScreen
 from src.highscores import load_highscores
 from src.ui.highscorescreen import HighscoreScreen
+from src.snowmanager import SnowManager
 
 MENU = "menu"
 GAME = "game"
@@ -29,10 +30,18 @@ class Main:
         self.FPS = pygame.time.Clock()
         self.stop_ground_scroll = False
 
-        # Apply dark blue overlay to both bg and ground
+        # NOTE: this overlay is just to make the background darker
+        # So it is easier to see the game elements
         overlay = pygame.Surface((WIDTH+300, HEIGHT), pygame.SRCALPHA) # add extra width to cover scrolling
         overlay.fill((30, 30, 80, 150))  # dark blue overlay
         self.bg_img.blit(overlay, (0, 0))
+
+        # Snow manager
+        self.snowmanager = SnowManager(
+            count=120,  # density
+            screen_width=WIDTH,
+            screen_height=HEIGHT
+        )
 
 
         # Game states
@@ -50,7 +59,7 @@ class Main:
         tutorial_text = (
             "Welcome to Sleigh Drop!\n"
             "Left click to drop presents.\n"
-            "Deliver presents to the correct houses.\n"
+            "Deliver presents to the good houses.\n"
             "Do not deliver to bad houses or you lose health.\n"
             "Avoid flying into clouds and houses!\n"
         )
@@ -73,6 +82,9 @@ class Main:
         world = World(screen)
         while True:
             self.screen.blit(self.bg_img, (0, 0))
+            self.snowmanager.update()
+            self.snowmanager.draw(self.screen)
+
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

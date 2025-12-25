@@ -31,6 +31,12 @@ class Cloud(pygame.sprite.Sprite):
             h*0.6
         )
 
+    def collides_with(self, rect):
+        return (
+            self.hitbox_center.colliderect(rect)
+            or self.hitbox_bottom.colliderect(rect)
+        )
+
     def draw_hitboxes(self, surface):
         # Draw center hitbox in red
         pygame.draw.rect(surface, (255, 0, 0), self.hitbox_center, 2)

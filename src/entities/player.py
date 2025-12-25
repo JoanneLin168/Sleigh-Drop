@@ -1,21 +1,24 @@
+import random
 import pygame
 from src.settings import import_sprite
 from src.settings import (
 	max_health, animation_delay,
 	follow_strength, max_speed, drop_cooldown
 )
+from src.entities.particle import Particle
 
 class Player(pygame.sprite.Sprite):
 	def __init__(self, pos, size):
 		super().__init__()
 		# play basic info
+		self.health = max_health
 		self.frame_index = 0
 		self.animation_delay = animation_delay
 		self.follow_strength = follow_strength
 		self.max_speed = max_speed
 		self.drop_cooldown = drop_cooldown
-		
-		self.health = max_health
+		self.particles = []
+		self.particle_timer = 0
 
 		self.last_drop = pygame.time.get_ticks()
 
@@ -29,6 +32,14 @@ class Player(pygame.sprite.Sprite):
 		# player status
 		self.direction = pygame.math.Vector2(0, 0)
 		self.score = 0
+
+	def _emit_trail(self):
+		for _ in range(2):  # density
+			spawn_pos = (
+				self.rect.left,
+				self.rect.centery + random.randint(-8, 8) + 5
+			)
+			self.particles.append(Particle(spawn_pos))
 
 	# for player's flying animation
 	def _animate(self):
@@ -73,4 +84,11 @@ class Player(pygame.sprite.Sprite):
 	def update(self, player_event = None):
 		if self.health > 0:
 			self._animate()
+			self._emit_trail()
+
+		# Update particles
+		for particle in self.particles[:]:
+			particle.update()
+			if particle.life <= 0:
+				self.particles.remove(particle)
 

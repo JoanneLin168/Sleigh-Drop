@@ -94,12 +94,17 @@ class World:
             self.playing = False
             self.game_over = True
             self.player.sprite.health = 0
-        elif pygame.sprite.groupcollide(self.player, self.clouds, False, True):
-            self.player.sprite.health -= 1
-        elif pygame.sprite.groupcollide(self.player, self.clouds_storm, False, False):
-            self.playing = False
-            self.game_over = True
-            self.player.sprite.health = 0
+        for cloud in self.clouds:
+            if cloud.collides_with(self.player.sprite.rect):
+                player.health -= 1
+                cloud.kill()  # remove cloud after hit
+                break
+        for cloud in self.clouds_storm:
+            if cloud.collides_with(self.player.sprite.rect):
+                self.playing = False
+                self.game_over = True
+                self.player.sprite.health = 0
+                break
 
 
         # Increment score if passed a bad house
@@ -229,6 +234,8 @@ class World:
         self.player.draw(self.screen)
         self.presents.update(self.world_shift)
         self.presents.draw(self.screen)
+        for particle in self.player.sprite.particles:
+            particle.draw(self.screen)
 
         if self.playing:
             self.game.show_score(self.player.sprite.score)

@@ -6,7 +6,7 @@ class TextScreen:
     def __init__(self, screen, title, text, buttons=None):
         self.screen = screen
 
-        self.title_font = pygame.font.SysFont(None, 64)
+        self.title_font = pygame.font.SysFont('Bauhaus 93', 64)
         self.body_font = pygame.font.SysFont(None, 32)
 
         self.title = title
