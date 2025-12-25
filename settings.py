@@ -18,8 +18,8 @@ cloud_size = WIDTH // 10
 cloud_gap = (cloud_size * 2) + (cloud_size // 2)
 
 # world scrolling
-world_shift_speed = -3 # this with gradually get faster over time
-world_shift_acceleration = -0.001
+world_shift_speed = -2 # this with gradually get faster over time
+world_shift_acceleration = -0.0001
 
 # player
 player_start_pos = (250, HEIGHT//2)

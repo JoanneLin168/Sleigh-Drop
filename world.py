@@ -7,6 +7,7 @@ from settings import *
 
 from present import Present
 import random
+import sys
 
 class World:
     def __init__(self, screen):
@@ -132,7 +133,7 @@ class World:
                 self.player.sprite.health -= 1
                 present.kill()
 
-    def draw_health_bar(self, surface, x, y, health, max_health):
+    def _draw_health_bar(self, surface, x, y, health, max_health):
         BAR_WIDTH = 150
         BAR_HEIGHT = 16
 
@@ -144,6 +145,21 @@ class World:
         pygame.draw.rect(surface, (60, 60, 60), bg_rect)
         pygame.draw.rect(surface, (220, 50, 50), fill_rect)
         pygame.draw.rect(surface, (255, 255, 255), bg_rect, 2)
+
+    def handle_event(self, event):
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE and not self.game_over:
+                self.playing = True
+            if event.key == pygame.K_r:
+                self.update("restart")
+
+        elif event.type == pygame.MOUSEBUTTONDOWN and self.playing:
+            if event.button == 1:
+                self.update("shoot")
 
     # updates the player's overall state
     def update(self, player_event = None):
@@ -170,6 +186,7 @@ class World:
             self.clouds_storm.empty()
             self.presents.empty()
             self.player.score = 0
+            self.current_house = None
             self._generate_world()
         else:
             player_event = False
@@ -202,7 +219,7 @@ class World:
 
         # Drawing game info
         self.game.show_score(self.player.sprite.score)
-        self.draw_health_bar(
+        self._draw_health_bar(
             self.screen,
             x=20,
             y=20,

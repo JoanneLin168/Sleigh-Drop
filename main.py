@@ -2,6 +2,13 @@
 import pygame, sys
 from settings import WIDTH, HEIGHT, world_shift_speed
 from world import World
+from ui.button import Button
+from ui.menu import Menu
+from ui.textscreen import TextScreen
+
+MENU = "menu"
+GAME = "game"
+TUTORIAL = "tutorial"
 
 pygame.init()
 
@@ -24,26 +31,66 @@ class Main:
         overlay.fill((30, 30, 80, 150))  # dark blue overlay
         self.bg_img.blit(overlay, (0, 0))
 
+
+        # Game state
+        self.menu = Menu(screen)
+        self.state = MENU
+        self.font = pygame.font.SysFont(None, 48)
+        self.start_button = Button(
+            WIDTH // 2 - 100,
+            HEIGHT // 2 - 30,
+            200,
+            60,
+            "Start Game",
+            self.font
+        )
+        tutorial_text = (
+            "Welcome to Sleigh Drop!\n"
+            "Left click to drop presents.\n"
+            "Deliver presents to the correct houses.\n"
+            "Do not deliver to bad houses or you lose health.\n"
+            "Avoid flying into clouds and houses!\n"
+        )
+
+        self.tutorial_screen = TextScreen(
+            screen,
+            "How to Play",
+            tutorial_text
+        )
+
     def main(self):
         world = World(screen)
         while True:
-            self.screen.blit(self.bg_img, (0, 0))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                elif event.type == pygame.KEYDOWN:
-                    if not world.playing and not world.game_over:
-                        world.playing = True
-                    if event.key == pygame.K_SPACE and not world.game_over:
-                        world.playing = True
-                    if event.key == pygame.K_r:
-                        world.update("restart")
-                elif event.type == pygame.MOUSEBUTTONDOWN and world.playing:
-                    if event.button == 1:
-                        world.update("shoot")
 
-            world.update()
+                if self.state == MENU:
+                    result = self.menu.handle_event(event)
+                    if result == "start":
+                        self.world = World(self.screen)
+                        self.state = GAME
+                    elif result == "tutorial":
+                        self.state = TUTORIAL
+                elif self.state == TUTORIAL:
+                    result = self.tutorial_screen.handle_event(event)
+                    if result == "back":
+                        self.state = MENU
+
+                elif self.state == GAME:
+                    self.world.handle_event(event)  # optional refactor
+
+            if self.state == MENU:
+                self.menu.update()
+
+            elif self.state == TUTORIAL:
+                self.tutorial_screen.update()
+
+            elif self.state == GAME:
+                self.screen.blit(self.bg_img, (0, 0))
+                self.world.update()
+
             pygame.display.update()
             self.FPS.tick(60)
 
