@@ -3,12 +3,7 @@ from house import House
 from cloud import Cloud
 from player import Player
 from game import GameIndicator
-from settings import (
-    WIDTH, HEIGHT, house_size, house_gap, house_sizes_units,
-    world_shift_speed, world_shift_acceleration,
-    max_health,
-    cloud_spawn_chance, clouds_spawn_min_score, cloud_size_units, cloud_size, cloud_gap, cloud_storm_chance
-)
+from settings import *
 
 from present import Present
 import random
@@ -35,7 +30,7 @@ class World:
 
     # creates the player and the obstacle
     def _generate_world(self):
-        player = Player((WIDTH//2 - house_size, HEIGHT//2 - house_size), 30)
+        player = Player(player_start_pos, player_size)
         self.player.add(player)
         self._add_house()
 
@@ -216,8 +211,8 @@ class World:
         )
 
         
-        # Debugging
-        for cloud in self.clouds:
-            cloud.draw_hitboxes(self.screen)
-        for cloud in self.clouds_storm:
-            cloud.draw_hitboxes(self.screen)
+        # # Debugging
+        # for cloud in self.clouds:
+        #     cloud.draw_hitboxes(self.screen)
+        # for cloud in self.clouds_storm:
+        #     cloud.draw_hitboxes(self.screen)

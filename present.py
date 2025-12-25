@@ -1,10 +1,13 @@
 import pygame
 from settings import present_speed
+import random
 
 class Present(pygame.sprite.Sprite):
     def __init__(self, width, pos, size):
         super().__init__()
-        self.image = pygame.image.load("assets/presents/0.png").convert_alpha()
+        idx = random.choice([0, 1, 2])
+        img_path = f"assets/presents/{idx}.png"
+        self.image = pygame.image.load(img_path).convert_alpha()
         self.image = pygame.transform.scale(self.image, (size, size))
         self.rect = self.image.get_rect(center=pos)
         self.width = width

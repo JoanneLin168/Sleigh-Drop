@@ -20,7 +20,7 @@ class Player(pygame.sprite.Sprite):
 		self.last_drop = pygame.time.get_ticks()
 
 		# player animation
-		self.player_img = import_sprite("assets/bird")
+		self.player_img = import_sprite("assets/santa")
 		self.image = self.player_img[self.frame_index]
 		self.image = pygame.transform.scale(self.image, (size, size))
 		self.rect = self.image.get_rect(topleft = pos)
