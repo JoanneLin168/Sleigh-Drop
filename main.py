@@ -32,7 +32,7 @@ class Main:
         self.bg_img.blit(overlay, (0, 0))
 
 
-        # Game state
+        # Game states
         self.menu = Menu(screen)
         self.state = MENU
         self.font = pygame.font.SysFont(None, 48)
@@ -51,16 +51,26 @@ class Main:
             "Do not deliver to bad houses or you lose health.\n"
             "Avoid flying into clouds and houses!\n"
         )
-
-        self.tutorial_screen = TextScreen(
+        back_button = Button(
+            WIDTH // 2 - 100,
+            HEIGHT - 100,
+            200,
+            50,
+            "Back",
+            self.font
+        )
+        self.tutorial = TextScreen(
             screen,
             "How to Play",
-            tutorial_text
+            tutorial_text,
+            buttons=[(back_button, "back")],
         )
 
     def main(self):
         world = World(screen)
         while True:
+            self.screen.blit(self.bg_img, (0, 0))
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -69,26 +79,30 @@ class Main:
                 if self.state == MENU:
                     result = self.menu.handle_event(event)
                     if result == "start":
+                        # create game
                         self.world = World(self.screen)
                         self.state = GAME
                     elif result == "tutorial":
                         self.state = TUTORIAL
                 elif self.state == TUTORIAL:
-                    result = self.tutorial_screen.handle_event(event)
-                    if result == "back":
+                    button_clicked = self.tutorial.handle_event(event)
+                    if button_clicked:
                         self.state = MENU
 
                 elif self.state == GAME:
-                    self.world.handle_event(event)  # optional refactor
+                    result = self.world.handle_event(event)
+                    if result == "menu":
+                        self.state = MENU
 
+
+            # Game updates
             if self.state == MENU:
                 self.menu.update()
 
             elif self.state == TUTORIAL:
-                self.tutorial_screen.update()
+                self.tutorial.update()
 
             elif self.state == GAME:
-                self.screen.blit(self.bg_img, (0, 0))
                 self.world.update()
 
             pygame.display.update()

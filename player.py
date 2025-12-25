@@ -71,5 +71,6 @@ class Player(pygame.sprite.Sprite):
 		return False
 
 	def update(self, player_event = None):
-		self._animate()
+		if self.health > 0:
+			self._animate()
 

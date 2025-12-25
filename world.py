@@ -20,7 +20,7 @@ class World:
         self.clouds_storm = pygame.sprite.Group()
         self.player = pygame.sprite.GroupSingle()
         self._generate_world()
-        self.playing = False
+        self.playing = True
         self.game_over = False
         # self.passed = True
         self.game = GameIndicator(screen)
@@ -151,15 +151,17 @@ class World:
             pygame.quit()
             sys.exit()
 
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE and not self.game_over:
-                self.playing = True
-            if event.key == pygame.K_r:
-                self.update("restart")
-
         elif event.type == pygame.MOUSEBUTTONDOWN and self.playing:
             if event.button == 1:
                 self.update("shoot")
+
+        elif event.type == pygame.MOUSEBUTTONDOWN and self.game_over:
+            if event.button == 1:
+                result = self.game.gameover_screen.handle_event(event)
+                if result == "restart":
+                    self.update("restart")
+                elif result == "menu":
+                    return "menu"
 
     # updates the player's overall state
     def update(self, player_event = None):
@@ -188,14 +190,21 @@ class World:
             self.player.score = 0
             self.current_house = None
             self._generate_world()
+            self.playing = True
         else:
             player_event = False
 
         # configuring player actions
         if self.playing:
             self.player.sprite.move()
-        else:
-            self.game.instructions()
+            self.game.show_score(self.player.sprite.score)
+            self._draw_health_bar(
+                self.screen,
+                x=20,
+                y=20,
+                health=self.player.sprite.health,
+                max_health=max_health
+            )
 
         # New house adder
         self.distance_since_last_house += abs(self.world_shift)
@@ -216,18 +225,10 @@ class World:
         self.presents.update(self.world_shift)
         self.presents.draw(self.screen)
 
+        # Game Over screen
+        if self.game_over:
+            self.game.show_gameover(self.player.sprite.score)
 
-        # Drawing game info
-        self.game.show_score(self.player.sprite.score)
-        self._draw_health_bar(
-            self.screen,
-            x=20,
-            y=20,
-            health=self.player.sprite.health,
-            max_health=max_health
-        )
-
-        
         # # Debugging
         # for cloud in self.clouds:
         #     cloud.draw_hitboxes(self.screen)

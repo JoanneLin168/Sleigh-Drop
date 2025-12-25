@@ -16,7 +16,9 @@ class Menu:
         self.exit_btn = Button(center_x, 420, button_w, button_h, "Exit", self.font)
 
     def update(self):
-        self.screen.fill((30, 30, 80))
+        overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+        overlay.fill((30, 30, 80, 150))
+        self.screen.blit(overlay, (0, 0))
 
         title_font = pygame.font.SysFont(None, 72)
         title = title_font.render("Sleigh Drop", True, (255, 255, 255))
