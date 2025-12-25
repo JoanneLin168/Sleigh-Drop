@@ -78,8 +78,10 @@ class Main:
 
                 if self.state == MENU:
                     result = self.menu.handle_event(event)
-                    if result == "start":
-                        # create game
+                    if result == "start": # create game
+                        # lock mouse into window
+                        pygame.event.set_grab(True)
+                        pygame.mouse.set_visible(False)
                         self.world = World(self.screen)
                         self.state = GAME
                     elif result == "tutorial":
@@ -93,6 +95,9 @@ class Main:
                     result = self.world.handle_event(event)
                     if result == "menu":
                         self.state = MENU
+                        # release mouse
+                        pygame.event.set_grab(False)
+                        pygame.mouse.set_visible(True)
 
 
             # Game updates

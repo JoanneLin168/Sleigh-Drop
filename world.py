@@ -205,6 +205,10 @@ class World:
                 health=self.player.sprite.health,
                 max_health=max_health
             )
+            
+            # lock mouse
+            pygame.event.set_grab(True)
+            pygame.mouse.set_visible(False)
 
         # New house adder
         self.distance_since_last_house += abs(self.world_shift)
@@ -227,6 +231,10 @@ class World:
 
         # Game Over screen
         if self.game_over:
+            # unlock mouse
+            pygame.event.set_grab(False)
+            pygame.mouse.set_visible(True)
+
             self.game.show_gameover(self.player.sprite.score)
 
         # # Debugging
