@@ -1,7 +1,9 @@
 import pygame
-from settings import WIDTH, HEIGHT
-from ui.textscreen import TextScreen
-from ui.button import Button
+from src.settings import WIDTH, HEIGHT
+from src.ui.textscreen import TextScreen
+from src.ui.button import Button
+
+from src.highscores import update_highscores
 
 pygame.font.init()
 

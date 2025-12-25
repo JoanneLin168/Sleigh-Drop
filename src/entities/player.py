@@ -1,6 +1,6 @@
 import pygame
-from settings import import_sprite
-from settings import (
+from src.settings import import_sprite
+from src.settings import (
 	max_health, animation_delay,
 	follow_strength, max_speed, drop_cooldown
 )

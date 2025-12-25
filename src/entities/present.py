@@ -1,5 +1,5 @@
 import pygame
-from settings import present_speed
+from src.settings import present_speed
 import random
 
 class Present(pygame.sprite.Sprite):

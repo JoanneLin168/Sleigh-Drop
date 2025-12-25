@@ -1,11 +1,12 @@
 import pygame
-from house import House
-from cloud import Cloud
-from player import Player
-from game import GameIndicator
-from settings import *
+from src.entities.house import House
+from src.entities.cloud import Cloud
+from src.entities.player import Player
+from src.game import GameIndicator
+from src.highscores import update_highscores
+from src.settings import *
 
-from present import Present
+from src.entities.present import Present
 import random
 import sys
 
@@ -22,7 +23,7 @@ class World:
         self._generate_world()
         self.playing = True
         self.game_over = False
-        # self.passed = True
+        self.score_handled = False
         self.game = GameIndicator(screen)
         self.presents = pygame.sprite.Group()
 
@@ -182,6 +183,7 @@ class World:
                 self._spawn_present()
         elif player_event == "restart":
             self.game_over = False
+            self.score_handled = False
             self.houses.empty()
             self.player.empty()
             self.clouds.empty()
@@ -197,7 +199,6 @@ class World:
         # configuring player actions
         if self.playing:
             self.player.sprite.move()
-            self.game.show_score(self.player.sprite.score)
             self._draw_health_bar(
                 self.screen,
                 x=20,
@@ -229,12 +230,18 @@ class World:
         self.presents.update(self.world_shift)
         self.presents.draw(self.screen)
 
+        if self.playing:
+            self.game.show_score(self.player.sprite.score)
+
         # Game Over screen
         if self.game_over:
             # unlock mouse
             pygame.event.set_grab(False)
             pygame.mouse.set_visible(True)
 
+            if not self.score_handled:
+                update_highscores(self.player.sprite.score)
+                self.score_handled = True
             self.game.show_gameover(self.player.sprite.score)
 
         # # Debugging

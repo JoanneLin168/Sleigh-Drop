@@ -1,14 +1,17 @@
 # main.py
 import pygame, sys
-from settings import WIDTH, HEIGHT, world_shift_speed
-from world import World
-from ui.button import Button
-from ui.menu import Menu
-from ui.textscreen import TextScreen
+from src.settings import WIDTH, HEIGHT, world_shift_speed
+from src.world import World
+from src.ui.button import Button
+from src.ui.menu import Menu
+from src.ui.textscreen import TextScreen
+from src.highscores import load_highscores
+from src.ui.highscorescreen import HighscoreScreen
 
 MENU = "menu"
 GAME = "game"
 TUTORIAL = "tutorial"
+HIGHSCORE = "highscore"
 
 pygame.init()
 
@@ -86,9 +89,20 @@ class Main:
                         self.state = GAME
                     elif result == "tutorial":
                         self.state = TUTORIAL
+                    elif result == "highscore":
+                        self.highscore_screen = HighscoreScreen(self.screen, load_highscores())
+                        back_btn = Button(WIDTH//2-100, HEIGHT-100, 200, 50, "Back", self.font)
+                        self.highscore_screen.set_back_button(back_btn)
+                        self.state = HIGHSCORE
+
                 elif self.state == TUTORIAL:
                     button_clicked = self.tutorial.handle_event(event)
                     if button_clicked:
+                        self.state = MENU
+
+                elif self.state == HIGHSCORE:
+                    button_clicked = self.highscore_screen.handle_event(event)
+                    if button_clicked == "back":
                         self.state = MENU
 
                 elif self.state == GAME:
@@ -106,6 +120,9 @@ class Main:
 
             elif self.state == TUTORIAL:
                 self.tutorial.update()
+
+            elif self.state == HIGHSCORE:
+                self.highscore_screen.update()
 
             elif self.state == GAME:
                 self.world.update()

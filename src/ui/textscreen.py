@@ -1,6 +1,6 @@
 import pygame
-from ui.textbox import TextBox
-from settings import WIDTH, HEIGHT
+from src.ui.textbox import TextBox
+from src.settings import WIDTH, HEIGHT
 
 class TextScreen:
     def __init__(self, screen, title, text, buttons=None):
